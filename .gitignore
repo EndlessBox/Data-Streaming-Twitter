@@ -1,0 +1,9 @@
+brew-2.0.0
+vscode/settings.json
+.idea
+.idea/
+__pycache__
+mysql_shared_folder
+test
+sketch.txt
+melb_data.csv
