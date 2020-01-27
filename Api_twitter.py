@@ -8,7 +8,7 @@ from pprint import pprint
 
 class StreamTwitter:
 
-    def __init__(self):
+    def __init__(self, log):
         self.extract = Extract()
         # self.colors = Colors()
         self.stream_url = self.extract.api['TwitterStream']
@@ -16,10 +16,12 @@ class StreamTwitter:
         self.rules = self.extract.api['TwitterStreamRulesSettings']
         self.auth = lambda x: {"Authorization" : "Bearer {}".format(x), "Content-type": "application/json"}
         self.conn = 0
-        self.sample_rules = [
-            { 'value': 'dog has:images', 'tag': 'dog pictures' },
-            { 'value': 'cat has:images -grumpy', 'tag': 'cat pictures' }
-        ]
+        self.log = lambda log: (log == 1)
+        # self.sample_rules = [
+        #     { 'value': 'dog has:images', 'tag': 'dog pictures' },
+        #     { 'value': 'cat has:images -grumpy', 'tag': 'cat pictures' }
+        # ]
+        self.store = open("test.json", "a")
 
     def connect_stream(self):
 
@@ -28,10 +30,12 @@ class StreamTwitter:
             if (self.conn == 0):
                 response = requests.get(self.stream_url, headers=self.auth(access_token), stream=True, params={"format": "detailed"})
                 self.conn = 1
-            for response_line in response.iter_lines():
-                if response_line:
-                    pprint(response_line)
-        except Exception as err:
+            self.store.write('{"Hey": [')
+            for line in response.iter_lines() :
+                if (line):
+                    json_dict = json.loads(line)
+                    
+        except Exception as err :
             print(err)
             response.close()
             sys.exit()
@@ -39,32 +43,32 @@ class StreamTwitter:
             print("success !")
             response.close()
 
-    def  set_rules(self, type):
+    def  set_rules(self, rules):
         payload = []
         try :
 
             access_token = os.environ.get('ACCESS_TOKEN_TWT')
             ''' 
                 Evaluat Rule given if it's in our Rules list ! 
-                Examined file : 'data_sources.json'            
-            '''
-            if type not in self.rules :
-                raise ModuleNotFoundError('Rule type is uncorrect')
+                Examined file : 'data_sources.json'  
 
-            ''' 
                 Check if the given rule has some content*
-                * (content) : the keyword, hashtags, user's that we will match againts twitter and filter tweets upon !
+                * (content) : the keyword, hashtags, user's that we will match againts twitter and filter tweets upon !          
             '''
-            if self.rules[type] == None :
-                raise KeyError ('Error : empty rules')
+            for rule in rules :
+                if rule not in self.rules :
+                    raise ModuleNotFoundError('Rule type is uncorrect')
+                elif self.rules[rule] == None :
+                    raise KeyError ('Error : empty rules')
 
             '''
                 After checking the rules given, we transform them to the correct format* for the api call.
                 * (format) : json format example : [{"value" : "cat has:media*"}, {"value" : "dog"}]
                 * (has:media) : optional parametrs check twitter operators !
             '''
-            for rule in self.rules[type] :
-                payload.append({'value' : rule})
+            for rule in rules :
+                for key in self.rules[rule] :
+                    payload.append({'value' : key})
             '''
                 manage all errors raised above.
             '''
@@ -96,24 +100,29 @@ class StreamTwitter:
             sys.exit()
 
         finally :
-            print("rules were added succefully")
+            if (self.log) :
+                for rule in rules :
+                    print (rule, end='\n')
+                print('')
+                print("rules were added succefully")
 
 
 
-    def get_rules(self, print):
+    def get_rules(self, log=0):
         try :
             access_token = os.environ.get('ACCESS_TOKEN_TWT')
             response = requests.get(self.stream_rules_url, headers=self.auth(access_token))
             if (response.status_code is not 200) :
                 raise Exception(response.text)
+            if (log == 1) :
+                pprint(response.json())
         except Exception as err :
             print(err)
             sys.exit()
         finally :
-            if (print == 1) :
-                pprint(response.text)
+            if (log == 1) :
+                pprint(response.json())
             return (response.json())
-
     def reset_rules(self):
         rules = self.get_rules(0)
         rules_ids = list()

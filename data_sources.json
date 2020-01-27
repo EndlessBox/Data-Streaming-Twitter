@@ -5,9 +5,9 @@
             "TwitterStream" : "https://api.twitter.com/labs/1/tweets/stream/filter",
             "TwitterStreamRules" : "https://api.twitter.com/labs/1/tweets/stream/filter/rules",
             "TwitterStreamRulesSettings" : {
-                "keywords" : ["1337", "1337 khouribga", "1337 Benguérir", "1337 Benguerir"],
+                "keywords" : ["dog"],
                 "hashtags" : ["#1337", "#FutureIsLoading"],
-                "user" : ["@1337FIL", "@mohamedaminehe"],
+                "user" : ["@1337FIL"],
                 "countries" : []
             }
         },

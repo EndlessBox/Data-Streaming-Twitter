@@ -3,21 +3,38 @@ from Extract_data import Extract
 from Api_twitter import StreamTwitter
 from pprint import pprint
 import os
+import json
+import sys
+import time
 
-if __name__ == "__main__":
+def connect_stream(keywords, log):
     extract = Extract()
     if "ACCESS_TOKEN_TWT" not in os.environ :
         extract.usage_accessToken()
-    stream = StreamTwitter()
-    stream.reset_rules()
-    stream.set_rules('keywords')
-    stream.set_rules('user')
-    stream.set_rules('hashtags')
-    stream.get_rules(1)
-    ''' UNCOMMENT THE FOLLOWING LINES TO CONNECT TO STREAM  / AFTER SETTING RULES'''
-
-    while (True):
+    stream = StreamTwitter(1)
+    stream.set_rules(keywords)
+    if (stream.log) :
+        stream.get_rules(1)
+    i = 0
+    while (True) :
         stream.connect_stream()
-        sleep(10)
-    # stream.set_rules('keywords')
-     
+        time.sleep((2 ** i) + 60)
+        i += 1
+
+
+if __name__ == "__main__":
+
+    # hey = open("test.json", "r")
+    # clean = (hey.read()).replace("}{", "},{")
+    # pprint(json.loads(clean))
+
+
+    db = Mysql("localhost", "root", "hello", "Tweets", 3306)
+    db.create_db()
+
+    """
+        Un-comment to connect stream.
+        1 : the programe will make a test.json to store and print logs
+        0 : no logs
+    """
+    # connect_stream(list(['hashtags', 'keywords', 'user']), 1)

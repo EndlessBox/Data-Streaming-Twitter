@@ -1,9 +1,10 @@
 brew-2.0.0
-vscode/settings.json
+.vscode
 .idea
 .idea/
 __pycache__
 mysql_shared_folder
-test
+test.json
+clean.json
 sketch.txt
 melb_data.csv
