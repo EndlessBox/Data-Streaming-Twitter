@@ -12,9 +12,10 @@ and the same time store all the incoming data into a mysql data.
 - python.
 - docker (mysql, phpmyadmin).
 
-# usage : - before executing the "figure_it_out.py" you have to execute "./get_bearer.sh <api_key> <api_secret_key>".
-            it will generate a "bearer token" and store it along with your <api-key> <api_secret_key> in env variables named :
-            * ACCESS_TOKEN_TWT
-            * API_KEY_TWT
-            * API_SECRET_TWT
-          - you can activate and de-activate log output on screen, by changin the "data_sources/log" value in the  "data_sources.json" file. 
+# usage : 
+- before executing the "figure_it_out.py" you have to execute "./get_bearer.sh <api_key> <api_secret_key>".
+  it will generate a "bearer token" and store it along with your <api-key> <api_secret_key> in env variables named :
+     * ACCESS_TOKEN_TWT
+     * API_KEY_TWT
+     * API_SECRET_TWT
+- you can activate and de-activate log output on screen, by changin the "data_sources/log" value in the  "data_sources.json" file. 
