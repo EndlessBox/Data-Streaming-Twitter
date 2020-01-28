@@ -19,11 +19,6 @@ class StreamTwitter:
         self.auth = lambda x: {"Authorization" : "Bearer {}".format(x), "Content-type": "application/json"}
         self.conn = 0
         self.log = lambda log: (log == 1)
-        # self.sample_rules = [
-        #     { 'value': 'dog has:images', 'tag': 'dog pictures' },
-        #     { 'value': 'cat has:images -grumpy', 'tag': 'cat pictures' }
-        # ]
-        # self.store = open("test.json", "a")
 
     def connect_stream(self):
 
@@ -35,7 +30,8 @@ class StreamTwitter:
             for line in response.iter_lines() :
                 if (line):
                     json_dict = json.loads(line)
-                    pprint(json_dict)
+                    if (self.log) :
+                        pprint(json_dict)
                     self.load_twt_to_db(json_dict)
                     
         except Exception as err :
@@ -148,10 +144,8 @@ class StreamTwitter:
     def reset_rules(self):
         rules = self.get_rules(0)
         rules_ids = list()
-        # if (rules['data'] is None) :
-        #     raise Exception ('Empty set of rules')
         if ('data' not in rules):
-            print('Empty set or rules.')
+            print('Empty set of rules.')
             return
         for rule in rules['data']:
             rules_ids.append(rule['id'])
