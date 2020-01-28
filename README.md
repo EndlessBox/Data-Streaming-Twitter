@@ -1,4 +1,4 @@
-                                                              # Data_streaming
+                                               # Data_streaming
 
 This side project was made with "learning the data engineering process" in mind.
 so i made a program that stream data from twitter, following some rules that user can set in "data_sources.json" file.
