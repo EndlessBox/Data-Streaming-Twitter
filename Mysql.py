@@ -1,5 +1,6 @@
 import pymysql.cursors
 import sys
+from datetime import datetime
 
 class Mysql:
     def __init__(self, host, username, password, db_name, port):
@@ -8,25 +9,31 @@ class Mysql:
         self.pwd = password
         self.db_name = db_name
         self.port = port
-        self.conn = None
+        self.conn = self.connect()
     
     def connect(self):
         try :
-            if self.conn is None:
-                self.conn = pymysql.connect(host=self.host, user=self.user, password=self.pwd)
+            conn = pymysql.connect(host=self.host, user=self.user, password=self.pwd, db=self.db_name)
+            return conn
         except Exception as err :
             print ("Error : {0}".format(err))
             sys.exit()
         finally:
             print ("MySQL connection opened succefully.")
     
-    def create_db(self) :
+    def db_add(self, author_id, time_creation, lang, sensitive, like_count, retweet_count, reply_count, quote_count, tweet_body) :
         try :
             with self.conn.cursor() as cursor:
-                sql = f"CREATE DATABASE %s;"
-                cursor.excute(sql, self.db_name)
-                self.connection.commit()
+                query = "INSERT INTO tweets VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                if ("T" in time_creation) :
+                    time_creation = time_creation.replace("T", " ")
+                    time_creation = time_creation.split(".", 1)[0]
+
+                cursor.execute(query, (author_id, time_creation, lang, sensitive, like_count, retweet_count, reply_count, quote_count, tweet_body))
+                self.conn.commit()
         except Exception as err :
+            print ("function : db_add")
             print(err)
             sys.exit()
+            
     

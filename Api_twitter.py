@@ -1,4 +1,5 @@
 from Extract_data import Extract
+from Mysql import Mysql
 import requests
 import json
 import os
@@ -10,6 +11,7 @@ class StreamTwitter:
 
     def __init__(self, log):
         self.extract = Extract()
+        self.sql = Mysql("localhost", "root", "hello", "tweets", 3306)
         # self.colors = Colors()
         self.stream_url = self.extract.api['TwitterStream']
         self.stream_rules_url = self.extract.api['TwitterStreamRules']
@@ -21,7 +23,7 @@ class StreamTwitter:
         #     { 'value': 'dog has:images', 'tag': 'dog pictures' },
         #     { 'value': 'cat has:images -grumpy', 'tag': 'cat pictures' }
         # ]
-        self.store = open("test.json", "a")
+        # self.store = open("test.json", "a")
 
     def connect_stream(self):
 
@@ -30,10 +32,11 @@ class StreamTwitter:
             if (self.conn == 0):
                 response = requests.get(self.stream_url, headers=self.auth(access_token), stream=True, params={"format": "detailed"})
                 self.conn = 1
-            self.store.write('{"Hey": [')
             for line in response.iter_lines() :
                 if (line):
                     json_dict = json.loads(line)
+                    pprint(json_dict)
+                    self.load_twt_to_db(json_dict)
                     
         except Exception as err :
             print(err)
@@ -42,6 +45,23 @@ class StreamTwitter:
         else :
             print("success !")
             response.close()
+
+    def load_twt_to_db(self, tweet_dict) :
+        try :
+            author_id = tweet_dict['data']['author_id']
+            created_at = tweet_dict['data']['created_at']
+            lang = tweet_dict['data']['lang']
+            possibly_sensitive = (tweet_dict['data']['possibly_sensitive'] == 'True')
+            like_count = tweet_dict['data']['stats']['like_count']
+            retweet_count = tweet_dict['data']['stats']['retweet_count']
+            reply_count = tweet_dict['data']['stats']['reply_count']
+            quote_count = tweet_dict['data']['stats']['quote_count']
+            twt_body = tweet_dict['data']['text']
+            self.sql.db_add(author_id, created_at, lang, possibly_sensitive, like_count, retweet_count, reply_count, quote_count, twt_body)
+        except Exception as err :
+            print (err)
+            sys.exit()
+
 
     def  set_rules(self, rules):
         payload = []
@@ -68,7 +88,8 @@ class StreamTwitter:
             '''
             for rule in rules :
                 for key in self.rules[rule] :
-                    payload.append({'value' : key})
+                    if key :
+                        payload.append({'value' : key})
             '''
                 manage all errors raised above.
             '''
@@ -123,6 +144,7 @@ class StreamTwitter:
             if (log == 1) :
                 pprint(response.json())
             return (response.json())
+    
     def reset_rules(self):
         rules = self.get_rules(0)
         rules_ids = list()

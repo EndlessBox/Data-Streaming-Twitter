@@ -5,7 +5,7 @@
             "TwitterStream" : "https://api.twitter.com/labs/1/tweets/stream/filter",
             "TwitterStreamRules" : "https://api.twitter.com/labs/1/tweets/stream/filter/rules",
             "TwitterStreamRulesSettings" : {
-                "keywords" : ["dog"],
+                "keywords" : ["programming", "python", "ETL", "ETL pipeline", "Data engineering", "Data Science", "Big data"],
                 "hashtags" : ["#1337", "#FutureIsLoading"],
                 "user" : ["@1337FIL"],
                 "countries" : []
